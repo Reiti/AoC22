@@ -2,16 +2,17 @@ import util.Util
 
 object Day4:
   def main(args: Array[String]): Unit =
-    val input = Util.loadDayLines(4).map(_.split(",").map(_.split("-").map(_.toInt)))
+    val ranges = raw"(\d*)-(\d*),(\d*)-(\d*)".r
+    val input = Util.loadDayLines(4).map { case ranges(s1, e1, s2, e2) => (s1.toInt, e1.toInt, s2.toInt, e2.toInt) }
 
     //Part 1
-    println(input.count(l => contained(l.head, l.last)))
+    println(input.count(contained))
 
     //Part 2
-    println(input.count(l => overlap(l.head, l.last)))
+    println(input.count(overlap))
 
-  def contained(l: Array[Int], r: Array[Int]): Boolean =
-    (l.head >= r.head && l.last <= r.last) || (r.head >= l.head && r.last <= l.last)
+  def contained(ls: Int, le: Int, rs: Int, re: Int): Boolean =
+    (ls >= rs && le <= re) || (rs >= ls && re <= le)
 
-  def overlap(l: Array[Int], r: Array[Int]): Boolean =
-    (r.head <= l.head && l.head <= r.last) || (l.head <= r.head && r.head <= l.last)
+  def overlap(ls: Int, le: Int, rs: Int, re: Int): Boolean =
+    (rs <= ls && ls <= re) || (ls <= rs && rs <= le)
