@@ -2,7 +2,7 @@ import util.Util
 
 object Day4:
   def main(args: Array[String]): Unit =
-    val ranges = raw"(\d*)-(\d*),(\d*)-(\d*)".r
+    val ranges = raw"(\d+)-(\d+),(\d+)-(\d+)".r
     val input = Util.loadDayLines(4).map { case ranges(s1, e1, s2, e2) => (s1.toInt, e1.toInt, s2.toInt, e2.toInt) }
 
     //Part 1
