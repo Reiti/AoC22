@@ -27,8 +27,7 @@ object Day5:
 
   @tailrec
   def execute(stacks: Map[Int, String], instructions: List[(Int, Int, Int)], reverse: Boolean): Map[Int, String] = instructions match
-    case (count, src, dest) :: rest =>
-      execute(step(stacks, count, src, dest, reverse), rest, reverse)
+    case (count, src, dest) :: rest => execute(step(stacks, count, src, dest, reverse), rest, reverse)
     case _ => stacks
 
   def step(stacks: Map[Int, String], count: Int, src: Int, dest: Int, reverse: Boolean): Map[Int, String] =
