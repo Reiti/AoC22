@@ -72,31 +72,6 @@ object Util {
     result
   }
 
-  case class Node(label: String)
-  case class Graph(adj: Map[Node, Set[Node]]) {
-    case class DfsState(discovered: Set[Node] = Set(), activeNodes: Set[Node] = Set(), tsOrder: List[Node] = List(),
-                        isCyclic: Boolean = false)
-
-    def dfs: (List[Node], Boolean) = {
-      def dfsVisit(currState: DfsState, src: Node): DfsState = {
-        val newState = currState.copy(discovered = currState.discovered + src, activeNodes = currState.activeNodes + src,
-          isCyclic = currState.isCyclic || adj(src).exists(currState.activeNodes))
-
-        val finalState = adj(src).filterNot(newState.discovered).foldLeft(newState)(dfsVisit)
-        val ord = if(finalState.tsOrder.contains(src)) finalState.tsOrder else src :: finalState.tsOrder
-        finalState.copy(tsOrder = ord, activeNodes = finalState.activeNodes - src)
-      }
-
-      val stateAfterSearch = adj.keys.foldLeft(DfsState()) {(state, n) => if (state.discovered(n)) state else dfsVisit(state, n)}
-      (stateAfterSearch.tsOrder, stateAfterSearch.isCyclic)
-    }
-
-    def topologicalSort: Option[List[Node]] = dfs match {
-      case (topologicalOrder, false) => Some(topologicalOrder)
-      case _ => None
-    }
-  }
-
   private[Util] def getPath[B](map: scala.collection.mutable.HashMap[B, B], start: B): List[B] = {
     @tailrec
     def getPathH(curr: B, acc: List[B]): List[B] = map.get(curr) match {
