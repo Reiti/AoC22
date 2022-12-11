@@ -16,7 +16,7 @@ object Day11:
     val parsed = input.map(parse)
     val inputs = parsed.map(_._2).zipWithIndex.map(z => (z._2, z._1)).toMap
     val monkeys = parsed.map(_._1).zipWithIndex.toList
-    val modulo = monkeys.map(_._1.mod).reduce(Util.lcm)
+    val modulo = monkeys.map(_._1.mod).product
 
     val (_, inspections) = (1 to 20).foldLeft((inputs, Map[Int, Long]()))((c, _) => round(monkeys, c._1, c._2, true))
 
