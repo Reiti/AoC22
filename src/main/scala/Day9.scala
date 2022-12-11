@@ -1,10 +1,10 @@
-import util.Util
+import util.{Day, Util}
 
 import scala.annotation.tailrec
 
-object Day9:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDayLines(9).flatMap{ case s"$dir $count" => List.fill(count.toInt)(dir) }
+object Day9 extends Day(9):
+  override def solve(): Unit =
+    val input = inputLines.flatMap{ case s"$dir $count" => List.fill(count.toInt)(dir) }
 
     //Part 1
     println(move(input, 1).size)

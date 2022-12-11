@@ -1,10 +1,10 @@
-import util.Util
+import util.{Day, Util}
 
 import scala.annotation.tailrec
 
-object Day8:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDayMap(8).map(e => (e._1, e._2.asDigit))
+object Day8 extends Day(8):
+  override def solve(): Unit =
+    val input = inputMap.map(e => (e._1, e._2.asDigit))
 
     val vis = input.map(t => Util.vonNeumannNeighborhood.map(d => visible(t._1, t._2, input, d)))
 

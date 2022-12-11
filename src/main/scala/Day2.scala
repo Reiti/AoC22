@@ -1,8 +1,8 @@
-import util.Util
+import util.{Day, Util}
 
-object Day2:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDayLines(2).map(_.split(" ")).map(s => (s(0).charAt(0), s(1).charAt(0)))
+object Day2 extends Day(2):
+  override def solve(): Unit =
+    val input = inputLines.map(_.split(" ")).map(s => (s(0).charAt(0), s(1).charAt(0)))
 
     //Part 1
     println(input.map(score).sum)

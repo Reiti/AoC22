@@ -1,14 +1,14 @@
-import util.Util
+import util.{Day, Util}
 
 import scala.annotation.tailrec
 
-object Day7:
+object Day7 extends Day(7):
   sealed trait Node
   case class Dir(name: String) extends Node
   case class File(name: String, size: Int) extends Node
 
-  def main(args: Array[String]): Unit =
-    val dirs = parse("", Util.loadDayLines(7), Map())
+  override def solve(): Unit =
+    val dirs = parse("", inputLines, Map())
 
     val sizes = dirs.keys.map(d => (d.name, size(dirs, d))).toMap
 

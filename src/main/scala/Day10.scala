@@ -1,11 +1,10 @@
-import util.Util
+import util.{Day, Util}
 
 import scala.annotation.tailrec
 
-object Day10:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDayLines(10)
-    val values = run(input)
+object Day10 extends Day(10):
+  override def solve(): Unit =
+    val values = run(inputLines)
     val target = Set(20, 60, 100, 140, 180, 220)
 
     //Part 1

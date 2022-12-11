@@ -1,9 +1,7 @@
-import util.Util
+import util.{Day, Util}
 
-object Day6:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDay(6)
-
+object Day6 extends Day(6):
+  override def solve(): Unit =
     //Part 1
     println(input.sliding(4).zipWithIndex.find(_._1.distinct.length == 4).get._2 + 4)
 

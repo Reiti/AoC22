@@ -1,9 +1,9 @@
-import util.Util
+import util.{Day, Util}
 
-object Day4:
-  def main(args: Array[String]): Unit =
+object Day4 extends Day(4):
+  override def solve(): Unit =
     val ranges = raw"(\d+)-(\d+),(\d+)-(\d+)".r
-    val input = Util.loadDayLines(4).map { case ranges(s1, e1, s2, e2) => (s1.toInt, e1.toInt, s2.toInt, e2.toInt) }
+    val input = inputLines.map { case ranges(s1, e1, s2, e2) => (s1.toInt, e1.toInt, s2.toInt, e2.toInt) }
 
     //Part 1
     println(input.count(contained))

@@ -1,11 +1,11 @@
-import util.Util
+import util.Day
 
-object Day1:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDay(1).split("\n\n").map(_.split("\n").map(_.toInt).sum).sorted(Ordering[Int].reverse)
+object Day1 extends Day(1):
+  override def solve(): Unit =
+    val calories = input.split("\n\n").map(_.split("\n").map(_.toInt).sum).sorted(Ordering[Int].reverse)
 
     //Part 1
-    println(input.head)
+    println(calories.head)
 
     //Part 2
-    println(input.take(3).sum)
+    println(calories.take(3).sum)

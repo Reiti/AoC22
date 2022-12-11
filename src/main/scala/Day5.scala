@@ -1,10 +1,10 @@
-import util.Util
+import util.{Day, Util}
 
 import scala.annotation.tailrec
 
-object Day5:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDayKeepWhitespace(5).split("\n\n")
+object Day5 extends Day(5):
+  override def solve(): Unit =
+    val input = rawInput.split("\n\n")
 
     val stacks = input.head.split("\n")
       .map(_.toArray).transpose

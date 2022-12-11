@@ -1,4 +1,4 @@
-import util.Util
+import util.{Day, Util}
 
 import scala.annotation.tailrec
 
@@ -7,13 +7,12 @@ case class Monkey(operation: Long => Long, test: Long => Int, mod: Long):
     val nv = if divide then operation(v) / 3 else operation(v)
     (nv, test(nv))
 
-object Day11:
-  def main(args: Array[String]): Unit =
-    val input = Util.loadDay(11)
-      .split("Monkey \\d:")
+object Day11 extends Day(11):
+  override def solve(): Unit =
+    val parsed = input.split("Monkey \\d:")
       .filter(_.nonEmpty)
       .map(_.strip.split("\n").map(_.strip))
-    val parsed = input.map(parse)
+      .map(parse)
     val inputs = parsed.map(_._2).zipWithIndex.map(z => (z._2, z._1)).toMap
     val monkeys = parsed.map(_._1).zipWithIndex.toList
     val modulo = monkeys.map(_._1.mod).product
