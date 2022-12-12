@@ -82,7 +82,7 @@ object Util {
   }
 
   case class AStarResult[B](distance: Int, path: List[B])
-  def astar[B](start: B, target: B, neighbors: B => List[(B, Int)], heuristic: B => Int): AStarResult[B] = {
+  def astar[B](start: B, isTarget: B => Boolean, neighbors: B => List[(B, Int)], heuristic: B => Int): AStarResult[B] = {
     val distance = scala.collection.mutable.HashMap[B, Int]().withDefault(_ => Int.MaxValue)
     val prev = scala.collection.mutable.HashMap[B, B]()
     val visited = scala.collection.mutable.HashSet[B]()
@@ -93,8 +93,8 @@ object Util {
 
     while (q.nonEmpty) {
       val node = q.dequeue()
-      if (node == target) {
-        return AStarResult(distance(target), getPath(prev, target))
+      if (isTarget(node)) {
+        return AStarResult(distance(node), getPath(prev, node))
       }
       for (neigh <- neighbors(node)) {
         if (!visited.contains(neigh._1)) {
@@ -108,15 +108,23 @@ object Util {
       }
       visited.add(node)
     }
-    AStarResult(distance(target), getPath(prev, target))
+    AStarResult(Integer.MAX_VALUE, List())
   }
+
+  def astar[B](start: B, target: B, neighbors: B => List[(B, Int)], heuristic: B => Int): AStarResult[B] =
+    astar(start, (node: B) => node == target, neighbors, heuristic)
 
   def dijkstra[B](start: B, target: B, neighbors: B => List[(B, Int)]): AStarResult[B]  =
     astar(start, target, neighbors, _ => 0)
 
-  @targetName("dijkstraUnweighted")
-  def dijkstra[A](start: A, target: A, neighbors: A => List[A]): AStarResult[A] =
-    astar(start, target, (node: A) => neighbors(node).map(e => (e, 1)), _ => 0)
+  def dijkstra[B](start: B, isTarget: B => Boolean, neighbors: B => List[(B, Int)]): AStarResult[B]  =
+    astar(start, isTarget, neighbors, _ => 0)
+
+  def bfs[A](start: A, target: A, neighbors: A => List[A]): AStarResult[A] =
+    bfs(start, (node: A) => node == target, neighbors)
+
+  def bfs[A](start: A, isTarget: A => Boolean, neighbors: A => List[A]): AStarResult[A] =
+    dijkstra(start, isTarget, (node: A) => neighbors(node).map(e => (e, 1)))
 
   //https://stackoverflow.com/a/36960228
   def memoize[I, O](f: I => O): I => O = new mutable.HashMap[I, O]() {
