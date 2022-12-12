@@ -1,6 +1,6 @@
 package util
 
-import scala.annotation.tailrec
+import scala.annotation.{tailrec, targetName}
 import scala.collection.mutable
 import scala.io.Source
 import scala.util.Using
@@ -82,9 +82,7 @@ object Util {
   }
 
   case class AStarResult[B](distance: Int, path: List[B])
-
-  type WeightedGraph[A] = Map[A, List[(A, Int)]]
-  def astar[A, B](graph: WeightedGraph[A], start: B, target: B, neighbors: (WeightedGraph[A], B) => List[(B, Int)], heuristic: B => Int): AStarResult[B] = {
+  def astar[B](start: B, target: B, neighbors: B => List[(B, Int)], heuristic: B => Int): AStarResult[B] = {
     val distance = scala.collection.mutable.HashMap[B, Int]().withDefault(_ => Int.MaxValue)
     val prev = scala.collection.mutable.HashMap[B, B]()
     val visited = scala.collection.mutable.HashSet[B]()
@@ -98,7 +96,7 @@ object Util {
       if (node == target) {
         return AStarResult(distance(target), getPath(prev, target))
       }
-      for (neigh <- neighbors(graph, node)) {
+      for (neigh <- neighbors(node)) {
         if (!visited.contains(neigh._1)) {
           val newDistance = distance(node) + neigh._2
           if (newDistance < distance(neigh._1)) {
@@ -113,8 +111,12 @@ object Util {
     AStarResult(distance(target), getPath(prev, target))
   }
 
-  def dijkstra[A, B](graph: WeightedGraph[A], start: B, target: B, neighbors: (WeightedGraph[A], B) => List[(B, Int)]): AStarResult[B]  =
-    astar(graph, start, target, neighbors, _ => 0)
+  def dijkstra[B](start: B, target: B, neighbors: B => List[(B, Int)]): AStarResult[B]  =
+    astar(start, target, neighbors, _ => 0)
+
+  @targetName("dijkstraUnweighted")
+  def dijkstra[A](start: A, target: A, neighbors: A => List[A]): AStarResult[A] =
+    astar(start, target, (node: A) => neighbors(node).map(e => (e, 1)), _ => 0)
 
   //https://stackoverflow.com/a/36960228
   def memoize[I, O](f: I => O): I => O = new mutable.HashMap[I, O]() {
