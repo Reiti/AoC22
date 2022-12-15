@@ -138,6 +138,9 @@ object Util {
     Math.abs(p._1 - q._1) + Math.abs(p._2 - q._2)
   }
 
+  def manhattan(x: Int, y: Int, x1: Int, y1: Int): Int =
+    manhattan((x, y), (x1, y1))
+
   def parseMap(lines: Array[String]): Map[(Int, Int), Char] = {
     (for {
       i <- lines.indices
