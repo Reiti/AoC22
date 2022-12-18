@@ -11,7 +11,9 @@ object Day16 extends Day(16):
     println(maxFlow(rates, graph))
 
     //Part 2
-    println(maxFlowE(rates, graph))
+    Util.time {
+      println(maxFlowE(rates, graph))
+    }
 
   def simplify(rates: Map[String, Int], edges: Map[String, Set[String]]): Map[String, Set[(String, Int)]] =
     val relevantStarts = rates.filter(k => k._1 == "AA" || k._2 != 0)
@@ -59,18 +61,16 @@ object Day16 extends Day(16):
       case (m, _, e, _, unopened) if !unopened.contains(m) || !unopened.contains(e) => 0
       case (m, nextM, e, nextE, _) if m == e && nextM > nextE => 0
       case (m, nextM, e, nextE, unopened) =>
-        if nextM <= nextE then
-            rates(m) * Math.max(26 - nextM - 1, 0) + (unopened - m).toList.sortBy(k => rates(k)).reverse.map(n =>
+        if nextM < nextE then
+            rates(m) * Math.max(26 - nextM - 1, 0) + (unopened - m).map(n =>
               val d = graph(m).find(_._1 == n).get._2
               maxFlowE(n, nextM + d + 1, e, nextE, unopened - m)
             ).maxOption.getOrElse(0)
-        else if nextE <= nextM then
-            rates(e) * Math.max(26 - nextE - 1, 0) + (unopened - e).toList.sortBy(k => rates(k)).reverse.map(n =>
+        else
+            rates(e) * Math.max(26 - nextE - 1, 0) + (unopened - e).map(n =>
               val d = graph(e).find(_._1 == n).get._2
               maxFlowE(m, nextM, n, nextE + d + 1, unopened - e)
             ).maxOption.getOrElse(0)
-        else
-          maxFlowE(m ,nextM, e, nextE, unopened)
     }
     val next = graph("AA").toList.sortBy(_._2)
 
