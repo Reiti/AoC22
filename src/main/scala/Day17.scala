@@ -9,13 +9,9 @@ case class Shape(shape: Set[(Int, Int)]):
     shape.map(p => (p._1 + x, y - p._2))
 
   def collision(xPos: Int, yPos: Int, map: Set[(Int, Int)]): Boolean =
-    val t = at(xPos, yPos).exists(p =>
+    at(xPos, yPos).exists(p =>
       p._1 < 0 || p._1 > 6 || p._2 < 0 || map.contains((p._1, p._2))
     )
-
-    //if t then
-    //  println(s"${at(xPos, yPos).find(_._1 < 0)} - ${at(xPos, yPos).find(_._1 > 6)} - ${at(xPos, yPos).find(_._2 < 0)} - ${at(xPos, yPos).find(map.contains)}")
-    t
 
 object Day17 extends Day(17):
   override def solve(): Unit =
@@ -27,96 +23,72 @@ object Day17 extends Day(17):
 
     val shapes = Array(flat, cross, l, i, block)
 
-    val testInput = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>"
-
     val processed = input.split("").zipAll(List("v"), "v", "v").map(e => e._1 + e._2).mkString
 
     //Part 1
-    Util.time {
-        //printMap(play(processed.toCharArray, shapes, 2)._1)
-      println(play(processed.toCharArray, shapes, processed.length * 100)._2)
-    }
+    println(play(0, 0, processed.toCharArray, shapes, 2022, Set())._2)
 
+    val want = BigInt("1000000000000")
+    val target = want - BigInt(1846)
 
-    /*
-    val heights = play(LazyList.continually(input.toCharArray.toList).flatten, shapes.take(4000).toList)._1
+    val (_, init, _) = play(0, 0, processed.toCharArray, shapes, 1846, Set())
 
-    val tests = (1 to heights.size).view.flatMap(n => (0 to n).map(offset => (n, offset))).filter((n, offset) => (heights.length - offset) % n == 0)
+    val times = target / 1725
+    val tail = target % 1725
 
-    val repeats = tests.filter((n, offset) =>
-      val l = heights.drop(offset).grouped(n).map(_.sum).toList
-      if l.size >= 2 then
-        l.sliding(2).forall(e => e.head == e(1))
-      else
-        false
-    )
+    val (_, rep, _) = play(0, 0, processed.toCharArray, shapes, 1846 + 1725, Set())
 
-    /*
-    val (n, offset) = repeats.head
+    val diff = BigInt(rep - init)
 
-    val start = heights.take(offset)
-    val repeating = heights.slice(offset, offset + n)
-    */
+    val (_, t, _) = play(0, 0, processed.toCharArray, shapes, 1846 + tail.toInt, Set())
 
-    println(repeats.map((n, offset) =>
-      val start = heights.take(offset)
-      val repeating = heights.slice(offset, offset + n)
-      heightAfter(BigInt("1000000000000"), start, repeating)
-    ).max)
-    */
+    val tl = BigInt(t - init)
 
+    //Part 2
+    println(times * diff + init + tl)
 
-
-  def heightAfter(blocks: BigInt, start: List[Int], repeating: List[Int]): BigInt =
-    if blocks <= start.length then
-      start.take(blocks.toInt).sum
-    else
-      val tail = (blocks - BigInt(start.length)) % BigInt(repeating.length)
-      val rep = (blocks - BigInt(start.length)) / BigInt(repeating.length)
-
-      BigInt(start.sum) + rep*BigInt(repeating.sum) + BigInt(repeating.take(tail.toInt).sum)
-
-  def play(jets: Array[Char], shapes: Array[Shape], stopAt: Int): (Set[(Int, Int)], Int) =
+  def play(startC: Int, startS: Int, jets: Array[Char], shapes: Array[Shape], stopAt: Int, map: Set[(Int, Int)]): (Set[(Int, Int)], Int, Vector[Int]) =
     @tailrec
-    def playShape(posC: Int, posS: Int, x: Int, y: Int, map: Set[(Int, Int)], currMax: Int): (Set[(Int, Int)], Int) =
+    def playShape(posC: Int, posS: Int, x: Int, y: Int, map: Set[(Int, Int)], currMax: Int, lines: Set[(Set[Int], Int, Int)], heights: Vector[Int]): (Set[(Int, Int)], Int, Vector[Int]) =
       val shape = shapes(posS % 5)
       val action = jets(posC % jets.length)
 
       if posS == stopAt then
-        (map, currMax)
+        (map, currMax, heights)
       else
         action match
         case '>' =>
           if shape.collision(x + 1, y, map) then
-            playShape(posC + 1, posS, x, y, map, currMax)
+            playShape(posC + 1, posS, x, y, map, currMax, lines, heights)
           else
-            playShape(posC + 1, posS, x + 1, y, map, currMax)
+            playShape(posC + 1, posS, x + 1, y, map, currMax, lines, heights)
         case '<' =>
           if shape.collision(x - 1, y, map) then
-            playShape(posC + 1, posS, x, y, map, currMax)
+            playShape(posC + 1, posS, x, y, map, currMax, lines, heights)
           else
-            playShape(posC + 1, posS, x - 1, y, map, currMax)
+            playShape(posC + 1, posS, x - 1, y, map, currMax, lines, heights)
         case 'v' =>
           if shape.collision(x, y - 1, map) then
             val h = shape.at(x, y).map(_._2).max + 1
             val newMax = if currMax >= h then currMax else h
+            val newLine = (getLine(map ++ shape.at(x, y), newMax - 1), (posS + 1) % 5, (posC + 1) % jets.length)
 
-            playShape(posC + 1, posS + 1, 2, newMax + shapes((posS + 1) % 5).height + 3, map ++ shape.at(x, y), newMax)
+            /*
+            if countTops(map ++ shape.at(x, y)) > countTops(map) then
+              println("top: " + (posS + 1) % 5 + " - " + (posC + 1) % jets.length + " - " + newMax)
+            */
+
+            playShape(posC + 1, posS + 1, 2, newMax + shapes((posS + 1) % 5).height + 3, map ++ shape.at(x, y), newMax, lines + newLine, heights.appended(newMax - currMax))
           else
-            playShape(posC + 1, posS, x , y - 1, map, currMax)
+            playShape(posC + 1, posS, x , y - 1, map, currMax, lines, heights)
 
-    playShape(0, 0, 2, 3, Set[(Int, Int)](), 0)
+    playShape(startC, startS, 2, 3, map, 0, Set(), Vector())
 
-  def hasLine(map: Set[(Int, Int)], at: Int): Boolean =
-    (0 to 6).forall(x => map.contains((x, at)))
+  def getLine(map: Set[(Int, Int)], at: Int): Set[Int] =
+    (0 to 6).map(x => (x, at)).filter(e => map.contains(e)).map(e => e._1).toSet
 
+  def countTops(map: Set[(Int, Int)]): Int =
+    val present = List((0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0), (6, 0), (0, -1), (1, -1), (2, -1), (3, -1), (4, -1))
+    val notPresent = List((5, -1), (6, -1))
 
-  def printMap(map: Set[(Int, Int)]): Unit =
-    (0 to getHeight(map)).reverse.foreach(i =>
-      (0 to 6).foreach(j =>
-      if map.contains((j, i)) then print("#") else print("."))
-      println
-    )
-
-  def getHeight(map: Set[(Int, Int)]): Int = if map.isEmpty then 0 else map.map(_._2).max + 1
-
+    map.count(e => present.forall(p => map.contains(e._1 + p._1, e._2 + p._2) && notPresent.forall(np => !map.contains(e._1 + np._1, e._2 + np._2))))
