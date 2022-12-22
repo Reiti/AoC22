@@ -6,17 +6,15 @@ object Day22 extends Day(22):
   override def solve(): Unit =
     val split = rawInput.split("\n\n")
     //val split = List("        ...#\n        .#..\n        #...\n        ....\n...#.......#\n........#...\n..#....#....\n..........#.\n        ...#....\n        .....#..\n        .#......\n        ......#.", "10R5L5R10L4R5L5");
+
     val map = split.head
     val instr = split(1).strip
-
-    println(instr)
 
     val lines = map.split("\n").toList
     val maxLength = lines.maxBy(_.length).length
     val parsedMap = lines.indices.flatMap(col => lines.head.padTo(maxLength, ' ').indices.map(row => {
       (col, row) -> lines(col).padTo(maxLength, ' ')(row)
     })).toMap.filter(e => e._2 != ' ')
-
     val parsedInstructions = parseInstructions(instr)
 
     val (p, d) = move(parsedMap, parsedInstructions)
@@ -29,6 +27,7 @@ object Day22 extends Day(22):
 
     val (y, x) = p
 
+    //Part 1
     println(1000*(y + 1) + 4*(x + 1) + facingScore)
 
 
@@ -95,11 +94,6 @@ object Day22 extends Day(22):
       (nextP, nextD)
     )
 
-    //moveDistance((startY, startX), (0, 1), instructions.head.toInt)
-    //moveDistance((5, 10), (0, 1), 5)
-
-
-
   @tailrec
   def parseInstructions(instr: String, acc: List[String] = List()): List[String] =
     if instr.isEmpty then
@@ -121,8 +115,3 @@ object Day22 extends Day(22):
       )
       println
     )
-
-
-
-
-
