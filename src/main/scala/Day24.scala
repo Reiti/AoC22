@@ -65,19 +65,3 @@ object Day24 extends Day(24):
         case 'v' =>
           ((e._1 + 1) % maxY, e._2, e._3)
     )
-
-  def printState(state: ((Int, Int), Set[(Int, Int, Char)]), maxX: Int, maxY: Int): Unit =
-    val (pos, blizzards) = state
-    (0 to maxY).foreach(y =>
-      (0 to maxX).foreach(x =>
-        if pos._1 == y && pos._2 == x then
-          print("E")
-        else if x == 0 || y == 0 || x == maxX || y == maxY then
-          print("#")
-        else if blizzards.exists(e => e._1== y - 1 && e._2 == x - 1) then
-          print("B")
-        else
-          print(".")
-      )
-      println
-    )
